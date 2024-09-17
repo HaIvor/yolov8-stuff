@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 import os
+import subprocess
 
 # Define the output filename before using it
 output_filename = "output_with_detections.mp4"
@@ -91,3 +92,21 @@ while True:
 cap.release()
 out.release()
 cv2.destroyAllWindows()
+
+# Automate the FFmpeg command to re-encode the video and preserve the audio
+
+output_reencoded = "output_fixed_with_audio.mp4"
+ffmpeg_command = [
+    'ffmpeg',
+    '-i', output_filename,  # Input the generated video with YOLO detections
+    '-c:v', 'libx264',      # Re-encode the video to H.264
+    '-c:a', 'copy',         # Preserve the original audio
+    output_reencoded        # Output filename
+]
+
+try:
+    print("Re-encoding video with FFmpeg...")
+    subprocess.run(ffmpeg_command, check=True)
+    print(f"Video re-encoded successfully: {output_reencoded}")
+except subprocess.CalledProcessError as e:
+    print(f"Error during re-encoding: {e}")
