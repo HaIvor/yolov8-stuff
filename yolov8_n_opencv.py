@@ -19,8 +19,8 @@ detection_colors = [
     for _ in class_list
 ]
 
-# Load YOLOv8 model
-model = YOLO("weights/yolov8n.pt", "v8")
+# Load YOLOv8 model (no need for "v8" argument)
+model = YOLO("weights/yolov8n.pt")
 
 # Open the video file
 cap = cv2.VideoCapture("inference/videos/mehmet.mp4")
@@ -48,14 +48,13 @@ while True:
 
     # Predict using YOLOv8 model
     detect_params = model.predict(source=[frame], conf=0.45, save=False)
-    DP = detect_params[0].numpy()
 
-    if len(DP) != 0:
-        for i in range(len(detect_params[0])):
-            box = detect_params[0].boxes[i]
-            clsID = int(box.cls.numpy()[0])
-            conf = box.conf.numpy()[0]
-            bb = box.xyxy.numpy()[0]
+    if len(detect_params[0].boxes) != 0:
+        for box in detect_params[0].boxes:
+            # Move tensors to CPU before converting to numpy
+            clsID = int(box.cls.cpu().numpy()[0])  # Move to CPU
+            conf = box.conf.cpu().numpy()[0]  # Move to CPU
+            bb = box.xyxy.cpu().numpy()[0]  # Move to CPU
 
             # Draw the detection box
             cv2.rectangle(
@@ -66,8 +65,8 @@ while True:
                 3,
             )
 
-            # Display class name and confidence
-            label = f"{class_list[clsID]} {round(conf, 3)}"
+            # Display class name and confidence with 2 decimal places
+            label = f"{class_list[clsID]} {conf:.2f}"
             cv2.putText(
                 frame,
                 label,
@@ -98,6 +97,7 @@ cv2.destroyAllWindows()
 output_reencoded = "output_fixed_with_audio.mp4"
 ffmpeg_command = [
     'ffmpeg',
+    '-y',                # Automatically overwrite the output file
     '-i', output_filename,  # Input the generated video with YOLO detections
     '-c:v', 'libx264',      # Re-encode the video to H.264
     '-c:a', 'copy',         # Preserve the original audio
@@ -108,5 +108,11 @@ try:
     print("Re-encoding video with FFmpeg...")
     subprocess.run(ffmpeg_command, check=True)
     print(f"Video re-encoded successfully: {output_reencoded}")
+    
+    # Delete the intermediate video without audio
+    if os.path.exists(output_filename):
+        os.remove(output_filename)
+        print(f"Deleted the temporary file: {output_filename}")
+        
 except subprocess.CalledProcessError as e:
     print(f"Error during re-encoding: {e}")
