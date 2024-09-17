@@ -1,4 +1,4 @@
-copyright @ DEPA MSU 2023 | Public
+Copyright @ DEPA MSU 2023 | Public
 
 # YoloV8-Silva || [YouTube](https://www.youtube.com/watch?v=hg4oVgNq7Do)
 
