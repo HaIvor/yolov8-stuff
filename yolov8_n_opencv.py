@@ -94,14 +94,18 @@ cv2.destroyAllWindows()
 
 # Automate the FFmpeg command to re-encode the video and preserve the audio
 
-output_reencoded = "output_fixed_with_audio.mp4"
+output_reencoded = "test.mp4"
 ffmpeg_command = [
     'ffmpeg',
     '-y',                # Automatically overwrite the output file
     '-i', output_filename,  # Input the generated video with YOLO detections
-    '-c:v', 'libx264',      # Re-encode the video to H.264
-    '-c:a', 'copy',         # Preserve the original audio
-    output_reencoded        # Output filename
+    '-i', 'inference/videos/mehmet.mp4',  # Input the original video (to copy audio)
+    '-c:v', 'libx264',   # Re-encode the video to H.264
+    '-c:a', 'aac',       # Re-encode the audio to AAC
+    '-b:a', '192k',      # Set audio bitrate to 192kbps
+    '-map', '0:v:0',     # Use the video stream from the YOLO output (first input)
+    '-map', '1:a:0',     # Use the audio stream from the original video (second input)
+    output_reencoded     # Output filename
 ]
 
 try:
