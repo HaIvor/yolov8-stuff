@@ -5,6 +5,15 @@ from ultralytics import YOLO
 import os
 import subprocess
 
+# Define a function to get an incrementing filename like test1.mp4, test2.mp4, etc.
+def get_incrementing_filename(base_filename, extension):
+    counter = 1
+    filename = f"{base_filename}{counter}{extension}"
+    while os.path.exists(filename):
+        counter += 1
+        filename = f"{base_filename}{counter}{extension}"
+    return filename
+
 # Define the output filename before using it
 output_filename = "output_with_detections.mp4"
 print("Saving video to:", os.path.abspath(output_filename))
@@ -92,9 +101,11 @@ cap.release()
 out.release()
 cv2.destroyAllWindows()
 
-# Automate the FFmpeg command to re-encode the video and preserve the audio
+# Get an incrementing filename like test1.mp4, test2.mp4, etc.
+output_reencoded_base = "output_vid"
+output_reencoded = get_incrementing_filename(output_reencoded_base, ".mp4")
 
-output_reencoded = "test.mp4"
+# Automate the FFmpeg command to re-encode the video and preserve the audio
 ffmpeg_command = [
     'ffmpeg',
     '-y',                # Automatically overwrite the output file
@@ -109,7 +120,7 @@ ffmpeg_command = [
 ]
 
 try:
-    print("Re-encoding video with FFmpeg...")
+    print(f"Re-encoding video as {output_reencoded} with FFmpeg...")
     subprocess.run(ffmpeg_command, check=True)
     print(f"Video re-encoded successfully: {output_reencoded}")
     
