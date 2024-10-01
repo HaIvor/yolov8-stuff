@@ -4,6 +4,7 @@ import numpy as np
 from ultralytics import YOLO
 import os
 import subprocess
+import torch
 
 # Define a function to get an incrementing filename like test1.mp4, test2.mp4, etc.
 def get_incrementing_filename(base_filename, extension):
@@ -29,8 +30,8 @@ detection_colors = [
 ]
 
 # Load YOLOv8 model (no need for "v8" argument)
-model = YOLO("weights/yolov8n.pt")
-
+model = YOLO("weights/yolov8n.pt").to("cuda")
+print(f"Device being used in model: {model.device}")
 # Open the video file
 cap = cv2.VideoCapture("inference/videos/mehmet.mp4")
 
