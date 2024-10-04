@@ -30,7 +30,7 @@ detection_colors = [
 ]
 
 # Load YOLOv8 model (no need for "v8" argument)
-model = YOLO("weights/yolov8n.pt").to("cuda")
+model = YOLO("weights/yolo11n.pt")
 print(f"Device being used in model: {model.device}")
 # Open the video file
 cap = cv2.VideoCapture("inference/videos/mehmet.mp4")
